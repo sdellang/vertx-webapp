@@ -1,6 +1,5 @@
 package it.redhat.services.handlers;
 
-import netscape.javascript.JSObject;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.Message;

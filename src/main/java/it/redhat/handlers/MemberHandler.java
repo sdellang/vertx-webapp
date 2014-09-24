@@ -46,7 +46,7 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
             return false;
         }
 
-        ValidatorService validator = new ValidatorService(vertx, container);
+        //ValidatorService validator = new ValidatorService(vertx, container);
         /*if(!name.isEmpty() && validator.validateEmail(email) && validator.validateTelNumber(number)) {
             return true;
         } */

@@ -16,7 +16,6 @@
  */
 package it.redhat.model;
 
-import com.sun.istack.internal.NotNull;
 
 import java.io.Serializable;
 
