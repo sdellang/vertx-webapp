@@ -1,0 +1,13 @@
+{
+        "address" : "mysql-persistor",
+        "connection" : "MySQL",
+        "host" : "localhost",
+        "port" : 3306,
+        "maxPoolSize" : 10,
+        "username" : "root",
+        "database" : "kitchensink",
+        "web-host" : "localhost",
+        "web-port" : 8180
+}
+
+
