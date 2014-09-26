@@ -51,14 +51,15 @@
             </div>
             
             <!-- We output a list of success messages (appropriately styled!) for the form. -->
-            <ul ng-hide="!successMessages" class="success">
-                <li ng-repeat="message in successMessages">{{message}}</li>
-            </ul>
+            <div ng-hide="!successMessages" ng-repeat="message in successMessages" class="alert alert-success">
+                {{message}}
+            </div>
+
 
             <!-- Output the list of error messages if any. -->
-            <ul ng-hide="!errorMessages" class="error">
-                <li ng-repeat="message in errorMessages">{{message}}</li>
-            </ul>
+            <div ng-hide="!errorMessages" ng-repeat="message in errorMessages" class="alert alert-danger alert-error">
+                {{message}}
+            </div>
 
             <!-- There are two buttons, the default submit action (which is bound for the whole form), and a reset button, that clears the form. -->
             <div class="form-group">

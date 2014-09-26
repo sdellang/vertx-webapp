@@ -63,6 +63,7 @@ function MembersCtrl($scope, $http, Members) {
         }, function(result) {
             if ((result.status == 409) || (result.status == 400)) {
                 $scope.errors = result.data;
+                $scope.errorMessages = [result.data]
             } else {
                 $scope.errorMessages = [ 'Unknown  server error' ];
             }

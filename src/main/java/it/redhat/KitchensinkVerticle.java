@@ -45,8 +45,9 @@ public class KitchensinkVerticle extends Verticle {
               .putNumber("port", appConfig.getInteger("web-port"));
 
     // deploy the mysql-persistor module, which we'll use for persistence
-    container.deployModule("io.vertx~mod-mysql-postgresql~0.3.0-SNAPSHOT", appConfig);
+    container.deployModule("io.vertx~mod-mysql-postgresql_2.10~0.3.1", appConfig);
     container.deployModule("io.vertx~mod-web-server~2.0.0-final", webConfig);
+    container.deployVerticle("it.redhat.services.ValidatorService");
     RouteMatcher routes = new RouteMatcher();
 
     routes.get("/rest/members" , new GetAllMemberHandler(vertx));

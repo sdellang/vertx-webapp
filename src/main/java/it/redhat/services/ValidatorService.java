@@ -19,8 +19,9 @@ public class ValidatorService extends BusModBase {
 
     public void start() {
         super.start();
-        vertx.eventBus().registerHandler("validator-service",new ValidatorHandler(vertx, container));
+        vertx.eventBus().registerHandler("email-validator",new ValidatorHandler(vertx, container));
         vertx.eventBus().registerHandler("telnumber-validator",new TelValidatoriHandler(vertx,container));
+        container.logger().info("Validator Service started");
     }
 
 }

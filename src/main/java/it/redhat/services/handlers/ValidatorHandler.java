@@ -29,6 +29,7 @@ public class ValidatorHandler implements Handler<Message<String>> {
     @Override
     public void handle(final Message<String> messagePrincipal) {
         String email = messagePrincipal.body();
+        container.logger().info("received email: "+email);
 
         Pattern emailPattern = Pattern.compile(EMAIL_PATTERN);
         isEmailValid = emailPattern.matcher(email).matches();
@@ -43,8 +44,9 @@ public class ValidatorHandler implements Handler<Message<String>> {
             @Override
             public void handle(Message<JsonObject> message) {
                 if(message.body().getArray("results").size() != 0) {
-                    container.logger().info("CAZZ!!!");
                     isEmailValid = false;
+                    messagePrincipal.reply(String.valueOf(isEmailValid));
+                } else {
                     messagePrincipal.reply(String.valueOf(isEmailValid));
                 }
             }

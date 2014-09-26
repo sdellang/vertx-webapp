@@ -20,11 +20,7 @@ public class RegisterMemberHandlerPost extends AbstractResultsHandler implements
 
     @Override
     public void handle(HttpServerRequest httpServerRequest) {
-        httpServerRequest.bodyHandler(new MemberHandler(vertx,container));
-        httpServerRequest.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8180");
-        httpServerRequest.response().putHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
-        httpServerRequest.response().putHeader("Access-Control-Allow-Headers","Content-Type, X-Requested-With");
-        httpServerRequest.response().setStatusCode(200);
-        httpServerRequest.response().end();
+        httpServerRequest.bodyHandler(new MemberHandler(vertx,container,httpServerRequest));
+
     }
 }
