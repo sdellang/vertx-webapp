@@ -1,13 +1,14 @@
 package it.redhat.handlers;
 
-import it.redhat.services.ValidatorService;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
+
 
 
 /**
@@ -30,7 +31,7 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
         final String body = buffer.getString(0, buffer.length());
         JsonObject payload = new JsonObject(body);
 
-        String name = payload.getString("name");
+        final String name = payload.getString("name");
         final String email = payload.getString("email");
         final String number = payload.getString("phoneNumber");
 
@@ -47,16 +48,29 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
                                     JsonObject query = new JsonObject()
                                             .putString("action", "insert")
                                             .putString("table", "Member")
-                                            .putString("fields", "email,name,phone_number");
-                                    sendPositiveReaponse();
+                                            .putArray("fields", new JsonArray().add("email").add("name").add("phone_number"))
+                                            .putArray("values", new JsonArray().addArray(new JsonArray().add(email).add(name).add(number)));
+                                    vertx.eventBus().send("mysql-persistor", query, new Handler<Message<JsonObject>>() {
+
+                                        @Override
+                                        public void handle(Message<JsonObject> message) {
+                                            container.logger().info(message.body().encodePrettily());
+                                            if(message.body().getField("status").equals("ok")) {
+                                                sendPositiveResponse();
+                                            } else {
+                                                sendNegativeResponse("internal error while registering member");
+                                            }
+                                        }
+                                    });
+
                                 } else {
-                                    sendNegativeReaponse("telephone number invalid");
+                                    sendNegativeResponse("telephone number invalid");
                                 }
 
                             }
                         });
                     } else {
-                        sendNegativeReaponse("Email invalid or already present");
+                        sendNegativeResponse("Email invalid or already present");
                     }
                 }});
         }
@@ -64,7 +78,7 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
         container.logger().info(payload.encodePrettily());
     }
 
-    private void sendPositiveReaponse() {
+    private void sendPositiveResponse() {
         request.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8180");
         request.response().putHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
         request.response().putHeader("Access-Control-Allow-Headers","Content-Type, X-Requested-With");
@@ -72,7 +86,7 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
         request.response().end();
     }
 
-    private void sendNegativeReaponse(String message) {
+    private void sendNegativeResponse(String message) {
         request.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8180");
         request.response().putHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
         request.response().putHeader("Access-Control-Allow-Headers","Content-Type, X-Requested-With");
