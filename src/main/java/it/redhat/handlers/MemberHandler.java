@@ -14,14 +14,12 @@ import org.vertx.java.platform.Container;
 /**
  * Created by samuele on 9/8/14.
  */
-public class MemberHandler extends AbstractResultsHandler implements Handler<Buffer> {
+public class MemberHandler extends ResultsHandler implements Handler<Buffer> {
 
     private final HttpServerRequest request;
-    Container container;
 
     public MemberHandler(Vertx vertx, Container container, HttpServerRequest httpServerRequest) {
-        super(vertx);
-        this.container = container;
+        super(vertx, container);
         this.request = httpServerRequest;
 
     }
@@ -56,43 +54,27 @@ public class MemberHandler extends AbstractResultsHandler implements Handler<Buf
                                         public void handle(Message<JsonObject> message) {
                                             container.logger().info(message.body().encodePrettily());
                                             if(message.body().getField("status").equals("ok")) {
-                                                sendPositiveResponse();
+                                                vertx.eventBus().publish("newmember-address","New member registered: "+name);
+                                                sendPositiveResponse(request);
                                             } else {
-                                                sendNegativeResponse("internal error while registering member");
+                                                sendNegativeResponse(request, "internal error while registering member");
                                             }
                                         }
                                     });
 
                                 } else {
-                                    sendNegativeResponse("telephone number invalid");
+                                    sendNegativeResponse(request, "telephone number invalid");
                                 }
 
                             }
                         });
                     } else {
-                        sendNegativeResponse("Email invalid or already present");
+                        sendNegativeResponse(request, "Email invalid or already present");
                     }
                 }});
         }
 
         container.logger().info(payload.encodePrettily());
-    }
-
-    private void sendPositiveResponse() {
-        request.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8180");
-        request.response().putHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
-        request.response().putHeader("Access-Control-Allow-Headers","Content-Type, X-Requested-With");
-        request.response().setStatusCode(200);
-        request.response().end();
-    }
-
-    private void sendNegativeResponse(String message) {
-        request.response().putHeader("Access-Control-Allow-Origin", "http://localhost:8180");
-        request.response().putHeader("Access-Control-Allow-Methods","GET, POST, PUT, DELETE, OPTIONS");
-        request.response().putHeader("Access-Control-Allow-Headers","Content-Type, X-Requested-With");
-        request.response().setStatusCode(400);
-        request.response().setStatusMessage(message);
-        request.response().end(message);
     }
 
 

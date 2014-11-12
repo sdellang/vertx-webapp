@@ -5,14 +5,15 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.platform.Container;
 
 /**
  * Created by samuele on 9/5/14.
  */
-public class GetMemberByIdHandler extends AbstractResultsHandler implements Handler<HttpServerRequest> {
+public class GetMemberByIdHandler extends ResultsHandler implements Handler<HttpServerRequest> {
 
-    public GetMemberByIdHandler(Vertx vertx) {
-       super(vertx);
+    public GetMemberByIdHandler(Vertx vertx, Container container) {
+       super(vertx, container);
     }
 
     @Override

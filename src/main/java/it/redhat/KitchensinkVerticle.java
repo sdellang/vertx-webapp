@@ -17,16 +17,14 @@ package it.redhat;
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
 
-import it.redhat.handlers.GetAllMemberHandler;
-import it.redhat.handlers.GetMemberByIdHandler;
-import it.redhat.handlers.RegisterMemberHandlerOptions;
-import it.redhat.handlers.RegisterMemberHandlerPost;
+import it.redhat.handlers.*;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.sockjs.SockJSServer;
 import org.vertx.java.platform.Verticle;
 
 /*
@@ -50,23 +48,39 @@ public class KitchensinkVerticle extends Verticle {
     container.deployVerticle("it.redhat.services.ValidatorService");
     RouteMatcher routes = new RouteMatcher();
 
-    routes.get("/rest/members" , new GetAllMemberHandler(vertx));
-    routes.options("/rest/members", new RegisterMemberHandlerOptions(vertx, container));
+    routes.get("/rest/members" , new GetAllMemberHandler(vertx, container));
+    routes.options("/rest/members", new MemberHandlerOptions(vertx, container));
+    routes.options("/rest/members/:id", new MemberHandlerOptions(vertx, container));
     routes.post("/rest/members", new RegisterMemberHandlerPost(vertx, container));
-    routes.get("/rest/members/:id" , new GetMemberByIdHandler(vertx));
+    routes.get("/rest/members/:id" , new GetMemberByIdHandler(vertx, container));
+    routes.delete("/rest/members/:id", new DeleteMemberByIdHandler(vertx, container));
 
-    vertx.createHttpServer().requestHandler(routes).listen(8888);
 
+    HttpServer httpServer =  vertx.createHttpServer();
+
+    JsonObject sockJsConfig = new JsonObject()
+            .putString("prefix", "/eventbus");
+
+    httpServer.requestHandler(routes);
+
+    SockJSServer sockJSServer = vertx.createSockJSServer(httpServer);
+
+    JsonArray inboundPermitted = new JsonArray();
+    JsonObject ping = new JsonObject().putString("address", "ping-address");
+    inboundPermitted.add(ping);
+
+    JsonArray outboundPermitted = new JsonArray();
+    JsonObject newmember = new JsonObject().putString("address","newmember-address");
+    JsonObject delmember = new JsonObject().putString("address","delmember-address");
+    outboundPermitted.add(newmember).add(delmember);
+
+    sockJSServer.bridge(sockJsConfig, inboundPermitted, outboundPermitted);
+
+    httpServer.listen(8888);
 
     container.logger().info("Webserver started, listening on port: 8888");
 
-    vertx.eventBus().registerHandler("ping-address", new Handler<Message<String>>() {
-      @Override
-      public void handle(Message<String> message) {
-        message.reply("pong!");
-        container.logger().info("Sent back pong");
-      }
-    });
+
 
     container.logger().info("KitchensinkVerticle started");
 

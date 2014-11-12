@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function MembersCtrl($scope, $http, Members) {
+function MembersCtrl($scope, $http, Members, vertxEventBusService) {
 
     // Define a refresh function, that updates the data from the REST service
     $scope.refresh = function() {
@@ -43,7 +43,18 @@ function MembersCtrl($scope, $http, Members) {
 
         // clear messages
         $scope.clearMessages();
+
+        vertxEventBusService.send('ping-address', {data: "ping"}).then(function(reply){
+            console.log('A reply received: ', reply);
+        }).catch(function(){
+            console.warn('No message');
+        });
+
     };
+
+    $scope.registervertx = function(message) {
+        console.log('Received a message: ', message);
+    }
 
     // Define a register function, which adds the member using the REST service,
     // and displays any error messages
@@ -58,8 +69,10 @@ function MembersCtrl($scope, $http, Members) {
             // Clear the form
             $scope.reset();
 
+
+
             // mark success on the registration form
-            $scope.successMessages = [ 'Member Registered' ];
+
         }, function(result) {
             if ((result.status == 409) || (result.status == 400)) {
                 $scope.errors = result.data;
@@ -78,7 +91,7 @@ function MembersCtrl($scope, $http, Members) {
 
             $scope.refresh();
 
-            $scope.successMessages = [ "Member Deleted" ];
+
         }, function(result) {
             if ((result.status == 409) || (result.status == 400)) {
                 $scope.errors = result.data;
@@ -94,6 +107,20 @@ function MembersCtrl($scope, $http, Members) {
     // Initialize newMember here to prevent Angular from sending a request
     // without a proper Content-Type.
     $scope.reset();
+
+    //register the handlers for vertx event bus
+    vertxEventBusService.on('delmember-address', function(message) {
+        console.log('Received a message: ', message);
+        $scope.successMessages = [ message ];
+    });
+
+    vertxEventBusService.on('newmember-address', function(message) {
+        console.log('Received a message: ', message);
+        $scope.successMessages = [ message ];
+        $scope.refresh();
+    });
+
+
 
     // Set the default orderBy to the name property
     $scope.orderBy = 'name';

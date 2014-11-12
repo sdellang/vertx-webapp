@@ -9,15 +9,14 @@ import org.vertx.java.platform.Container;
 /**
  * Created by samuele on 9/5/14.
  */
-public class RegisterMemberHandlerPost extends ResultsHandler implements Handler<HttpServerRequest> {
+public class MemberHandlerOptions extends ResultsHandler implements Handler<HttpServerRequest> {
 
-    public RegisterMemberHandlerPost(Vertx vertx, Container container) {
+    public MemberHandlerOptions(Vertx vertx, Container container) {
         super(vertx, container);
     }
 
     @Override
     public void handle(HttpServerRequest httpServerRequest) {
-        httpServerRequest.bodyHandler(new MemberHandler(vertx,container,httpServerRequest));
-
+        sendPositiveResponse(httpServerRequest);
     }
 }

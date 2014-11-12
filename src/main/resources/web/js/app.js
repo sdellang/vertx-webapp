@@ -16,11 +16,16 @@
  */
 // Define any routes for the app
 // Note that this app is a single page app, and each partial is routed to using the URL fragment. For example, to select the 'home' route, the URL is http://localhost:8080/jboss-as-kitchensink-angularjs-bootstrap/#/home
-angular.module('kitchensink', [ 'ngRoute', 'membersService' ])
-    .config( [ '$httpProvider','$routeProvider', function($httpProvider, $routeProvider) {
+angular.module('kitchensink', [ 'ngRoute', 'membersService','knalli.angular-vertxbus', 'ngAnimate'])
+    .config( [ '$httpProvider','$routeProvider', 'vertxEventBusProvider', function($httpProvider, $routeProvider, vertxEventBusProvider) {
         /*
          * Use a HTTP interceptor to add a nonce to every request to prevent MSIE from caching responses.
          */
+        vertxEventBusProvider
+            .enable()
+            .useReconnect()
+            .useDebug(true)
+            .useUrlServer('http://localhost:8888');
         $httpProvider.interceptors.push('ajaxNonceInterceptor');
 
         $routeProvider.
@@ -32,6 +37,8 @@ angular.module('kitchensink', [ 'ngRoute', 'membersService' ])
         }).otherwise({
             redirectTo : '/home'
         });
+
+
     } ])
     .factory('ajaxNonceInterceptor', function() {
         // This interceptor is equivalent to the behavior induced by $.ajaxSetup({cache:false});

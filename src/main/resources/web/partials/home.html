@@ -51,7 +51,7 @@
             </div>
             
             <!-- We output a list of success messages (appropriately styled!) for the form. -->
-            <div ng-hide="!successMessages" ng-repeat="message in successMessages" class="alert alert-success">
+            <div ng-hide="!successMessages" ng-repeat="message in successMessages" class="alert alert-success fadein fadeout" >
                 {{message}}
             </div>
 
@@ -91,7 +91,7 @@
                 <td>{{member.id}}</td>
                 <td>{{member.name}}</td>
                 <td>{{member.email}}</td>
-                <td>{{member.phoneNumber}}</td>
+                <td>{{member.phone_number}}</td>
                 <td><a href="http://localhost:8888/rest/members/{{member.id}}">/rest/members/{{member.id}}</a></td>
                 <td><input type="button" ng-click="delete()" name="remove" id="remove"  class="btn btn-danger" value="Delete"/></td>
             </tr>
